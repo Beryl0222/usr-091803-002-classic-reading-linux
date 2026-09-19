@@ -10,3 +10,5 @@ coverage/
 __pycache__/
 *.py[cod]
 .DS_Store
+# 本地事件日志含学生与批注数据，不入库
+*.jsonl
