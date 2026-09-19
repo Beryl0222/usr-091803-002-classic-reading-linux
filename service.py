@@ -4,6 +4,8 @@ import argparse
 import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+import reading_archive
+
 SERVICE_ID = "classic-reading"
 SERVICE_NAME = "名著多角度阅读档案"
 
@@ -11,6 +13,13 @@ SERVICE_NAME = "名著多角度阅读档案"
 def health_payload():
     """返回稳定的服务身份信息。"""
     return {"status": "ok", "service": SERVICE_ID, "name": SERVICE_NAME}
+
+
+def check():
+    """基础配置检查：服务身份与领域模块均可加载。"""
+    assert health_payload()["service"] == SERVICE_ID
+    assert reading_archive.ReadingArchive(reading_archive.EventStore()) is not None
+    print("基础检查通过")
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -37,8 +46,7 @@ def main():
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     if args.check:
-        assert health_payload()["service"] == SERVICE_ID
-        print("基础检查通过")
+        check()
         return
     ThreadingHTTPServer(("0.0.0.0", args.port), Handler).serve_forever()
 
